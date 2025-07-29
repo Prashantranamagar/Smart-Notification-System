@@ -197,6 +197,15 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',   # throttle authenticated users
+        'rest_framework.throttling.AnonRateThrottle',   # throttle anonymous users
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '100/hour',    # authenticated users can make 100 requests per hour
+        'anon': '10/minute',   # anonymous users can make 10 requests per minute
+    }
 }
 
 # JWT Settings

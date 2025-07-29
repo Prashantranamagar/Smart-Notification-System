@@ -1,6 +1,8 @@
 # api/serializers.py
-from django.contrib.auth.models import User
+from .models import User
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from app_notification.signals import jwt_logged_in
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -17,3 +19,13 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Trigger user_logged_in manually
+        request = self.context.get('request')
+        jwt_logged_in.send(sender=self.user.__class__, request=request, user=self.user)
+
+        return data

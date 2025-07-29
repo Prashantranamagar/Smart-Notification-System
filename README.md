@@ -36,7 +36,7 @@ A comprehensive Django REST API-based notification system with intelligent event
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/smart-notification-system.git
+git clone https://github.com/Prashantranamagar/Smart-Notification-System.git
 cd smart-notification-system
 ```
 

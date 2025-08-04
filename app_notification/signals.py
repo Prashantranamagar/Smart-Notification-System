@@ -30,14 +30,17 @@ def create_user_notification_preferences(sender, instance, created, **kwargs):
 def track_device_on_login(sender, request, user, **kwargs):
 
     device_id = request.headers.get("Device-ID")
-    print("************** hello device id ****************")
-    print("Device ID:", device_id)
+    logger.info(f"******************* User Device id {device_id} *******************")
+
     if not device_id:
         return
 
     try:
         existing_device = UserDevice.objects.get(user=user)
         if existing_device.device_id != device_id:
+            logger.info(
+                f"******************* Unrecognized Device login from {user}*******************"
+            )
             print("Updating device ID for user:", user.username)
             existing_device.device_id = device_id
             existing_device.save()
@@ -53,15 +56,13 @@ def track_device_on_login(sender, request, user, **kwargs):
             print("Device ID already exists for user:", user.username)
             existing_device.save()
     except UserDevice.DoesNotExist:
-        print("Creating new device entry for user:", user.username)
-        UserDevice.objects.create(user=user, device_id=device_id)
-        NotificationService.dispatch_notification(
-            event_type_code="new_device_login",
-            context={"user_id": user.id, "device_id": device_id},
-            target_users=[user.id],
+        logger.info(
+            f"*******************  Creating new device entry for user {user.username} *******************"
         )
+        UserDevice.objects.create(user=user, device_id=device_id)
+
     except Exception as e:
-        print(f"Error tracking device on login: {e}")
+        logger.error(f"Error tracking device on login: {e}", exc_info=True)
         return
 
 
@@ -90,7 +91,7 @@ def get_related_user_ids(post):
     author_id = post.author_id
 
     commenter_ids = (
-        post.comments.exclude(author_id=author_id) 
+        post.comments.exclude(author_id=author_id)
         .values_list("author_id", flat=True)
         .distinct()
     )
@@ -98,4 +99,4 @@ def get_related_user_ids(post):
     related_user_ids = set(commenter_ids)
     related_user_ids.add(author_id)
 
-    return list(related_user_ids)  
+    return list(related_user_ids)

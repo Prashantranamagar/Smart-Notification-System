@@ -82,7 +82,9 @@ class NotificationService:
             logger.info(
                 "******************* No target users provided, determining target users *******************"
             )
-            target_users = cls._determine_target_users(event_type_code, context)
+            target_users = cls._determine_target_users(
+                event_type_code, context
+            )  # determine target user
 
         logger.info(
             "******************* Target user Fetched sucessfully *******************"
@@ -97,7 +99,7 @@ class NotificationService:
                     "*******************Getting user preferences started *******************"
                 )
 
-                preferences = cls._get_user_preferences(user)
+                preferences = cls._get_user_preferences(user)  # get user preferences
 
                 if preferences.is_event_enabled(event_type_code):
 
@@ -213,7 +215,7 @@ class NotificationService:
         """
         Get or create notification template for dynamic event type
         """
-       
+
         template, created = NotificationTemplate.objects.get_or_create(
             event_type=event_type,
             channel=channel,
@@ -267,7 +269,7 @@ class NotificationService:
         )
 
         if event_type_code == "new_comment":
-            return context.get("follower_ids", [])
+            return context.get("target_users", [])
 
         elif event_type_code == "unrecognized_login":
             return [context.get("user_id")]
@@ -360,7 +362,7 @@ class NotificationService:
     @classmethod
     def _get_default_template(cls, event_type: str, channel: str) -> Dict[str, str]:
         """
-        Get default template content
+        Get default template content. If the event_type is not found, add a default entry.
         """
         templates = {
             "new_comment": {
@@ -376,13 +378,16 @@ class NotificationService:
                 "message_template": "You have {notification_count} new notifications this week.",
             },
         }
-        return templates.get(
-            event_type,
-            {
-                "title_template": "Notification",
-                "message_template": "You have a new notification.",
-            },
-        )
+
+        default_template = {
+            "title_template": "Notification",
+            "message_template": "You have a new notification.",
+        }
+
+        if event_type not in templates:
+            templates[event_type] = default_template  # Add it to templates
+
+        return templates[event_type]
 
     @classmethod
     def _determine_target_users(

@@ -55,7 +55,17 @@ LOGGING = {
             "level": LOG_LEVEL,
             "propagate": False,
         },
-        "myapp": {  # replace with your actual app name
+        "app_notification": {
+            "handlers": ["console", "file"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "authentication": {
+            "handlers": ["console", "file"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "post": {
             "handlers": ["console", "file"],
             "level": LOG_LEVEL,
             "propagate": False,
@@ -201,7 +211,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(
-        hours=config("ACCESS_TOKEN_LIFE_HOURS", default=15, cast=int)
+        hours=config("ACCESS_TOKEN_LIFE_HOURS", default=1, cast=int)
     ),
     "REFRESH_TOKEN_LIFETIME": timedelta(
         days=config("REFRESH_TOKEN_LIFE_HOURS", default=7, cast=int)

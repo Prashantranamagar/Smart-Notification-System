@@ -3,7 +3,7 @@ from typing import Dict, Any
 from django.core.mail import send_mail
 from django.conf import settings
 import logging
-from .models import NotificationChannel
+from .models import NotificationChannel, NotificationTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,7 @@ class InAppBackend(NotificationBackend):
         """
         For in-app notifications, they're already stored in the database
         """
+
         logger.info(
             f"In-app notification {notification.id} send success for user {notification.user.username}"
         )
